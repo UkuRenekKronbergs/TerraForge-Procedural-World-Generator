@@ -1,0 +1,127 @@
+// TerraForge Water Shader
+// Custom HLSL shader for realistic water rendering with waves and reflections
+
+// Water Surface Shader - USFD (Unreal Shader Format)
+// This shader creates dynamic water with:
+// - Animated waves using noise
+// - Fresnel reflections
+// - Depth-based color transitions
+// - Normal mapping for surface detail
+
+// Material inputs
+float Time;
+float3 WorldPosition;
+float WaveSpeed = 1.0;
+float WaveScale = 100.0;
+float WaveHeight = 50.0;
+float FresnelExponent = 5.0;
+float3 ShallowWaterColor = float3(0.0, 0.8, 0.9);
+float3 DeepWaterColor = float3(0.0, 0.2, 0.5);
+float WaterDepth = 1000.0;
+
+// Simple noise function for wave generation
+float Hash(float2 p)
+{
+    return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+float Noise(float2 p)
+{
+    float2 i = floor(p);
+    float2 f = frac(p);
+    float2 u = f * f * (3.0 - 2.0 * f);
+    
+    float a = Hash(i);
+    float b = Hash(i + float2(1.0, 0.0));
+    float c = Hash(i + float2(0.0, 1.0));
+    float d = Hash(i + float2(1.0, 1.0));
+    
+    return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
+}
+
+// Fractal Brownian Motion for detailed waves
+float FBM(float2 p)
+{
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+    
+    for (int i = 0; i < 4; i++)
+    {
+        value += amplitude * Noise(p * frequency);
+        amplitude *= 0.5;
+        frequency *= 2.0;
+    }
+    
+    return value;
+}
+
+// Calculate wave displacement
+float3 CalculateWaveDisplacement(float3 worldPos, float time)
+{
+    float2 uv = worldPos.xy / WaveScale;
+    
+    // Multiple wave layers
+    float wave1 = FBM(uv + float2(time * WaveSpeed * 0.1, 0.0));
+    float wave2 = FBM(uv * 2.0 - float2(0.0, time * WaveSpeed * 0.15));
+    float wave3 = FBM(uv * 0.5 + float2(time * WaveSpeed * 0.05, time * WaveSpeed * 0.05));
+    
+    float combinedWave = (wave1 + wave2 * 0.5 + wave3 * 0.25) / 1.75;
+    
+    return float3(0.0, 0.0, combinedWave * WaveHeight);
+}
+
+// Calculate water normal
+float3 CalculateWaterNormal(float3 worldPos, float time)
+{
+    float epsilon = 1.0;
+    float3 pos = worldPos;
+    
+    float heightCenter = CalculateWaveDisplacement(pos, time).z;
+    float heightRight = CalculateWaveDisplacement(pos + float3(epsilon, 0.0, 0.0), time).z;
+    float heightUp = CalculateWaveDisplacement(pos + float3(0.0, epsilon, 0.0), time).z;
+    
+    float3 tangent = float3(epsilon, 0.0, heightRight - heightCenter);
+    float3 bitangent = float3(0.0, epsilon, heightUp - heightCenter);
+    
+    return normalize(cross(bitangent, tangent));
+}
+
+// Main shader function
+void MaterialExpression(
+    float3 WorldPos,
+    float3 CameraVector,
+    float Time,
+    out float3 BaseColor,
+    out float3 Normal,
+    out float Metallic,
+    out float Roughness,
+    out float Opacity)
+{
+    // Calculate wave displacement
+    float3 displacement = CalculateWaveDisplacement(WorldPos, Time);
+    
+    // Calculate normal
+    Normal = CalculateWaterNormal(WorldPos, Time);
+    
+    // Calculate Fresnel effect
+    float fresnel = pow(1.0 - saturate(dot(normalize(CameraVector), Normal)), FresnelExponent);
+    
+    // Depth-based color
+    float depthFactor = saturate(WorldPos.z / WaterDepth);
+    float3 waterColor = lerp(DeepWaterColor, ShallowWaterColor, depthFactor);
+    
+    // Apply Fresnel to create reflective highlights
+    BaseColor = lerp(waterColor, float3(1.0, 1.0, 1.0), fresnel * 0.3);
+    
+    // Material properties
+    Metallic = 0.0;
+    Roughness = lerp(0.1, 0.3, 1.0 - fresnel);
+    Opacity = 0.85;
+}
+
+// Additional helper for vertex displacement (if used in material)
+float3 GetVertexOffset(float3 WorldPos, float Time)
+{
+    return CalculateWaveDisplacement(WorldPos, Time);
+}
