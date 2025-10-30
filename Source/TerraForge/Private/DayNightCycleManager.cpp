@@ -21,10 +21,18 @@ void ADayNightCycleManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// If a directional light actor is specified, use its light component
+	// If a directional light actor is specified, use its directional light component when available
 	if (DirectionalLightActor)
 	{
-		SunLight = DirectionalLightActor->GetLightComponent();
+		if (UDirectionalLightComponent* DirectionalComponent = Cast<UDirectionalLightComponent>(DirectionalLightActor->GetLightComponent()))
+		{
+			SunLight = DirectionalComponent;
+			RootComponent = SunLight;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DayNightCycleManager: DirectionalLightActor missing UDirectionalLightComponent."));
+		}
 	}
 	
 	// Initialize sun position and properties

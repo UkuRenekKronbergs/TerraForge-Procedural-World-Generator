@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.3",
+	"EngineAssociation": "5.6",
 	"Category": "",
 	"Description": "Interactive Procedural World Generator with dynamic terrain, water, and day/night cycle",
 	"Modules": [
