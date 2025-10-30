@@ -310,7 +310,7 @@ Camera->RotationSmoothSpeed = 3.0f;
 void SetupIslandWorld()
 {
     // Terrain: Gentle island with hills
-    AProceduralTerrainActor* Terrain = SpawnActor<AProceduralTerrainActor>();
+    AProceduralTerrainActor* Terrain = GetWorld()->SpawnActor<AProceduralTerrainActor>();
     Terrain->SetActorLocation(FVector(0, 0, -200));
     Terrain->TerrainWidth = 150;
     Terrain->TerrainHeight = 150;
@@ -324,7 +324,7 @@ void SetupIslandWorld()
     Terrain->GenerateTerrain();
     
     // Water: Tropical lagoon
-    ADynamicWaterActor* Water = SpawnActor<ADynamicWaterActor>();
+    ADynamicWaterActor* Water = GetWorld()->SpawnActor<ADynamicWaterActor>();
     Water->SetActorLocation(FVector(7500, 7500, 0));
     Water->WaterWidth = 15000.0f;
     Water->WaterLength = 15000.0f;
@@ -335,7 +335,7 @@ void SetupIslandWorld()
     Water->GenerateWaterMesh();
     
     // Day/Night: Tropical cycle
-    ADayNightCycleManager* DayNight = SpawnActor<ADayNightCycleManager>();
+    ADayNightCycleManager* DayNight = GetWorld()->SpawnActor<ADayNightCycleManager>();
     DayNight->TimeOfDay = 14.0f;  // Afternoon
     DayNight->CycleSpeed = 0.5f;   // Slow cycle
     DayNight->bAutoProgress = true;
@@ -351,7 +351,7 @@ void SetupIslandWorld()
 void SetupMountainValley()
 {
     // Terrain: Dramatic mountains
-    AProceduralTerrainActor* Terrain = SpawnActor<AProceduralTerrainActor>();
+    AProceduralTerrainActor* Terrain = GetWorld()->SpawnActor<AProceduralTerrainActor>();
     Terrain->SetActorLocation(FVector(0, 0, 0));
     Terrain->TerrainWidth = 200;
     Terrain->TerrainHeight = 200;
@@ -365,7 +365,7 @@ void SetupMountainValley()
     Terrain->GenerateTerrain();
     
     // Water: Mountain lake
-    ADynamicWaterActor* Water = SpawnActor<ADynamicWaterActor>();
+    ADynamicWaterActor* Water = GetWorld()->SpawnActor<ADynamicWaterActor>();
     Water->SetActorLocation(FVector(10000, 10000, 500));
     Water->WaterWidth = 5000.0f;
     Water->WaterLength = 5000.0f;
@@ -376,7 +376,7 @@ void SetupMountainValley()
     Water->GenerateWaterMesh();
     
     // Day/Night: Alpine lighting
-    ADayNightCycleManager* DayNight = SpawnActor<ADayNightCycleManager>();
+    ADayNightCycleManager* DayNight = GetWorld()->SpawnActor<ADayNightCycleManager>();
     DayNight->TimeOfDay = 8.0f;  // Morning
     DayNight->CycleSpeed = 1.0f;
     DayNight->bAutoProgress = true;
@@ -390,7 +390,7 @@ void SetupMountainValley()
 void SetupAlienWorld()
 {
     // Terrain: Strange formations
-    AProceduralTerrainActor* Terrain = SpawnActor<AProceduralTerrainActor>();
+    AProceduralTerrainActor* Terrain = GetWorld()->SpawnActor<AProceduralTerrainActor>();
     Terrain->TerrainWidth = 180;
     Terrain->TerrainHeight = 180;
     Terrain->MaxHeight = 4000.0f;
@@ -403,7 +403,7 @@ void SetupAlienWorld()
     Terrain->GenerateTerrain();
     
     // Water: Alien liquid (adjust material colors)
-    ADynamicWaterActor* Water = SpawnActor<ADynamicWaterActor>();
+    ADynamicWaterActor* Water = GetWorld()->SpawnActor<ADynamicWaterActor>();
     Water->WaterWidth = 20000.0f;
     Water->WaterLength = 20000.0f;
     Water->WaterLevel = -100.0f;
@@ -413,7 +413,7 @@ void SetupAlienWorld()
     // Set alien colors in material: green/purple tint
     
     // Day/Night: Strange lighting cycle
-    ADayNightCycleManager* DayNight = SpawnActor<ADayNightCycleManager>();
+    ADayNightCycleManager* DayNight = GetWorld()->SpawnActor<ADayNightCycleManager>();
     DayNight->CycleSpeed = 2.0f;  // Fast cycle
     DayNight->DayColor = FLinearColor(0.9f, 0.7f, 1.0f);  // Purple tint
     DayNight->SunsetColor = FLinearColor(1.0f, 0.3f, 0.5f);  // Pink
