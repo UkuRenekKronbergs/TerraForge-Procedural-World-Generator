@@ -39,6 +39,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TerraForge|DayNight")
 	float GetNormalizedTimeOfDay() const { return TimeOfDay / 24.0f; }
 
+	/** Get the current real-world clock time as text (HH:MM:SS) */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "TerraForge|DayNight")
+	FText GetRealWorldTimeText() const;
+
 	/** Directional light component (sun) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UDirectionalLightComponent* SunLight;

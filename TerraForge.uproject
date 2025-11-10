@@ -21,8 +21,6 @@
 		}
 	],
 	"TargetPlatforms": [
-		"Windows",
-		"Linux",
-		"Mac"
+		"Windows"
 	]
 }

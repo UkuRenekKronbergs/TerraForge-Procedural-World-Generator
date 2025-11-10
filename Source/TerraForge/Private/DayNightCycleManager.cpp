@@ -3,6 +3,7 @@
 
 #include "DayNightCycleManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/DateTime.h"
 
 ADayNightCycleManager::ADayNightCycleManager()
 {
@@ -214,4 +215,10 @@ float ADayNightCycleManager::GetTransitionFactor() const
 		// Night
 		return 0.0f;
 	}
+}
+
+FText ADayNightCycleManager::GetRealWorldTimeText() const
+{
+	const FDateTime Now = FDateTime::Now();
+	return FText::FromString(Now.ToString(TEXT("%H:%M:%S")));
 }
