@@ -2,7 +2,7 @@
 
 An interactive procedural world generator built with Unreal Engine that creates unique 3D landscapes on the fly. Explore dynamically generated terrain with realistic water and a real-time day/night cycle.
 
-![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.3-blue)
+![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.6-blue)
 ![C++](https://img.shields.io/badge/C++-17-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
@@ -37,13 +37,6 @@ An interactive procedural world generator built with Unreal Engine that creates 
 - **E/Q for vertical movement** (ascend/descend)
 - **Shift to sprint**, Ctrl to move slowly
 - **Customizable speed** and sensitivity settings
-
-## Requirements
-
-- **Unreal Engine 5.3+** (compatible with 5.2 and later)
-- **Visual Studio 2022** (Windows) or **Xcode** (Mac) for C++ compilation
-- **8GB RAM minimum** (16GB recommended)
-- **Graphics card** with DirectX 12 or Vulkan support
 
 ## Installation
 
@@ -191,83 +184,6 @@ All classes are Blueprint-accessible and can be extended:
    - Use Event Graph to modify terrain generation logic
    - Access `NoiseGenerator` functions for custom height calculations
 
-## Project Structure
-
-```
-TerraForge-Procedural-World-Generator/
-├── Config/
-│   ├── DefaultEngine.ini          # Engine configuration
-│   └── DefaultInput.ini            # Input mappings
-├── Content/
-│   ├── Blueprints/                 # Blueprint assets
-│   ├── Materials/                  # Material assets
-│   └── Shaders/
-│       └── WaterShader.usf         # Custom water shader (HLSL)
-├── Source/
-│   ├── TerraForge/
-│   │   ├── Public/
-│   │   │   ├── TerraForge.h                    # Module header
-│   │   │   ├── NoiseGenerator.h                # Noise generation
-│   │   │   ├── ProceduralTerrainActor.h        # Terrain generation
-│   │   │   ├── DayNightCycleManager.h          # Day/night cycle
-│   │   │   ├── DynamicWaterActor.h             # Water system
-│   │   │   ├── FreeCameraPawn.h                # Camera controls
-│   │   │   └── TerraForgeGameMode.h            # Game mode
-│   │   ├── Private/
-│   │   │   └── [corresponding .cpp files]
-│   │   └── TerraForge.Build.cs                 # Build configuration
-│   ├── TerraForge.Target.cs                    # Build target (game)
-│   └── TerraForgeEditor.Target.cs              # Build target (editor)
-├── .gitignore                                   # Git ignore rules
-├── TerraForge.uproject                         # Unreal project file
-└── README.md                                    # This file
-```
-
-## Technical Details
-
-### Noise Generation
-The project implements two noise algorithms:
-
-1. **Perlin Noise**:
-   - Classic gradient noise
-   - Multiple octaves for fractal detail
-   - Configurable persistence and lacunarity
-   - Good for natural-looking terrain
-
-2. **Simplex Noise**:
-   - Improved algorithm by Ken Perlin
-   - Better performance than Perlin noise
-   - More organic and natural patterns
-   - No directional artifacts
-
-### Water Shader
-The custom water shader (`WaterShader.usf`) implements:
-- **Fractal Brownian Motion (FBM)** for realistic wave patterns
-- **Multi-layered waves** with different speeds and scales
-- **Fresnel effect** for angle-dependent reflections
-- **Vertex displacement** for 3D wave geometry
-- **Dynamic normals** calculated from wave height field
-
-### Performance Optimization
-- **Async mesh cooking** for terrain generation
-- **LOD system** compatible (can be extended)
-- **Efficient noise calculation** with permutation table caching
-- **Material instance dynamics** for runtime parameter updates
-
-## Controls
-
-| Key/Input | Action |
-|-----------|--------|
-| **W** | Move forward |
-| **S** | Move backward |
-| **A** | Strafe left |
-| **D** | Strafe right |
-| **E** | Ascend |
-| **Q** | Descend |
-| **Mouse** | Look around |
-| **Left Shift** | Sprint (hold) |
-| **Left Ctrl** | Slow movement (hold) |
-| **~** or **`** | Open console |
 
 ## Customization
 
@@ -330,16 +246,6 @@ void AProceduralTerrainActor::ApplyBiomeColors()
 }
 ```
 
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## Troubleshooting
 
 ### Terrain not generating
@@ -357,26 +263,6 @@ Contributions are welcome! Please follow these guidelines:
 - Check that `CycleSpeed` is greater than zero
 - Verify the `DirectionalLightActor` reference is set (if using external light)
 
-### Build errors
-- Regenerate project files
-- Clean and rebuild solution
-- Ensure Unreal Engine version matches project requirements
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- **Perlin Noise algorithm** by Ken Perlin
-- **Simplex Noise algorithm** by Ken Perlin
-- Inspired by various procedural generation techniques in modern game development
-- Built with Unreal Engine by Epic Games
-
-## Contact
-
-Project Link: [https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator](https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator)
-
----
-
-**Made with ❤️ for procedural generation enthusiasts**
