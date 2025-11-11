@@ -9,16 +9,16 @@ An interactive procedural world generator built with Unreal Engine that creates 
 ## Features
 
 ### 🏔️ Procedural Terrain Generation
-The terrain uses Perlin and Simplex noise to generate heightmaps. You can tweak height, scale, octaves, persistence, and lacunarity to get different landscapes. Meshes are generated in real-time with proper normals and UVs. Everything is seed-based so you can recreate the same world, and all the important functions are exposed to Blueprints.
+The terrain uses Perlin and Simplex noise to generate heightmaps. You can tweak height, scale, octaves, persistence, and lacunarity to get different landscapes. Real-time mesh generation with smooth normals and proper UV mapping is in progress. Seed-based generation for reproducible worlds and Blueprint-exposed functions are planned.
 
 ### 🌊 Dynamic Water System
-There's a custom HLSL shader for the water that handles animated waves (using fractal Brownian motion), Fresnel reflections, depth-based color blending from shallow to deep, and normal mapping for surface detail. The water mesh is procedurally generated and you can adjust the subdivision level. Wave parameters can be changed at runtime.
+A custom HLSL water shader is planned with animated waves using fractal Brownian motion, Fresnel reflections, depth-based color transitions from shallow to deep water, and normal mapping for surface detail. The procedurally generated water mesh will have adjustable subdivision, and wave parameters will be controllable at runtime.
 
 ### 🌅 Day/Night Cycle
-Time progresses automatically at whatever speed you set. The sun moves based on the time of day, and colors transition smoothly between day, sunrise/sunset, and night. You can adjust the intensity for different times and control everything through Blueprints.
+Time progresses automatically at whatever speed you set, though it still needs some bug fixes. The sun moves based on the time of day, and colors transition smoothly between day, sunrise/sunset, and night. You can adjust the intensity for different times. There's a realistic sky for the skybox, but it needs to be made dynamic.
 
 ### 🎮 Free Camera Controls
-Standard WASD movement with smooth interpolation, mouse look, E/Q for up/down, Shift to sprint, Ctrl to slow down. Speed and sensitivity are all configurable.
+Standard WASD movement with smooth interpolation, inverted mouse look, E/Q for up/down, Shift to sprint, Ctrl to slow down. Speed and sensitivity are all configurable.  
 
 ## Installation
 
@@ -42,7 +42,7 @@ Build it:
 
 Finally, open `TerraForge.uproject` with Unreal Engine.
 
-### Option 2: Pre-built Binary (If Available)
+### Option 2: Pre-built .exe folder (for testing the game)
 
 If there's a pre-built version, grab it from the [Releases](https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator/releases) page.
 
