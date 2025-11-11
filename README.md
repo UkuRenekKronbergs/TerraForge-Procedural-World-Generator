@@ -9,95 +9,61 @@ An interactive procedural world generator built with Unreal Engine that creates 
 ## Features
 
 ### 🏔️ Procedural Terrain Generation
-- **Noise-based terrain generation** using Perlin and Simplex noise algorithms
-- **Customizable parameters**: height, scale, octaves, persistence, and lacunarity
-- **Real-time mesh generation** with smooth normals and proper UV mapping
-- **Seed-based generation** for reproducible worlds
-- **Blueprint-exposed functions** for easy customization
+The terrain uses Perlin and Simplex noise to generate heightmaps. You can tweak height, scale, octaves, persistence, and lacunarity to get different landscapes. Meshes are generated in real-time with proper normals and UVs. Everything is seed-based so you can recreate the same world, and all the important functions are exposed to Blueprints.
 
 ### 🌊 Dynamic Water System
-- **Custom HLSL water shader** with:
-  - Animated waves using fractal Brownian motion
-  - Fresnel reflections for realistic water appearance
-  - Depth-based color transitions (shallow to deep water)
-  - Normal mapping for surface detail
-- **Procedurally generated water mesh** with adjustable subdivision
-- **Real-time wave parameters** controllable at runtime
+There's a custom HLSL shader for the water that handles animated waves (using fractal Brownian motion), Fresnel reflections, depth-based color blending from shallow to deep, and normal mapping for surface detail. The water mesh is procedurally generated and you can adjust the subdivision level. Wave parameters can be changed at runtime.
 
 ### 🌅 Day/Night Cycle
-- **Automatic time progression** with configurable speed
-- **Dynamic sun positioning** based on time of day
-- **Smooth color transitions** between day, sunrise/sunset, and night
-- **Adjustable intensity** for different times of day
-- **Blueprint integration** for easy time control
+Time progresses automatically at whatever speed you set. The sun moves based on the time of day, and colors transition smoothly between day, sunrise/sunset, and night. You can adjust the intensity for different times and control everything through Blueprints.
 
 ### 🎮 Free Camera Controls
-- **WASD movement** with smooth interpolation
-- **Mouse look** for camera orientation
-- **E/Q for vertical movement** (ascend/descend)
-- **Shift to sprint**, Ctrl to move slowly
-- **Customizable speed** and sensitivity settings
+Standard WASD movement with smooth interpolation, mouse look, E/Q for up/down, Shift to sprint, Ctrl to slow down. Speed and sensitivity are all configurable.
 
 ## Installation
 
 ### Option 1: Clone and Build
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator.git
-   cd TerraForge-Procedural-World-Generator
-   ```
+First, clone the repo:
+```bash
+git clone https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator.git
+cd TerraForge-Procedural-World-Generator
+```
 
-2. **Generate project files**:
-   - **Windows**: Right-click `TerraForge.uproject` → Generate Visual Studio project files
-   - **Mac**: Right-click `TerraForge.uproject` → Generate Xcode project files
-   - **Linux**: Run `UnrealEngine/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh TerraForge.uproject`
+Then generate project files:
+- **Windows**: Right-click `TerraForge.uproject` → Generate Visual Studio project files
+- **Mac**: Right-click `TerraForge.uproject` → Generate Xcode project files
+- **Linux**: Run `UnrealEngine/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh TerraForge.uproject`
 
-3. **Build the project**:
-   - **Windows**: Open `TerraForge.sln` in Visual Studio 2022, set build configuration to `Development Editor`, and build
-   - **Mac**: Open `TerraForge.xcworkspace` in Xcode and build
-   - **Linux**: Run `make TerraForgeEditor`
+Build it:
+- **Windows**: Open `TerraForge.sln` in Visual Studio 2022, set build configuration to `Development Editor`, and build
+- **Mac**: Open `TerraForge.xcworkspace` in Xcode and build
+- **Linux**: Run `make TerraForgeEditor`
 
-4. **Launch the editor**:
-   - Open `TerraForge.uproject` with Unreal Engine
+Finally, open `TerraForge.uproject` with Unreal Engine.
 
 ### Option 2: Pre-built Binary (If Available)
 
-Download the latest release from the [Releases](https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator/releases) page.
+If there's a pre-built version, grab it from the [Releases](https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator/releases) page.
 
 ## Usage
 
 ### Quick Start
 
-1. **Open the project** in Unreal Engine
-2. **Create a new level** or open an existing one
-3. **Add terrain**:
-   - Drag `ProceduralTerrainActor` from the Content Browser into the level
-   - Adjust parameters in the Details panel (size, noise scale, octaves, etc.)
-   - The terrain will generate automatically
+Open the project in Unreal Engine, then create a new level or use an existing one.
 
-4. **Add water**:
-   - Drag `DynamicWaterActor` into the level
-   - Position it at your desired water level
-   - Assign the water material (if available)
+To add terrain, drag `ProceduralTerrainActor` from the Content Browser into the level. Adjust the parameters in the Details panel (size, noise scale, octaves, etc.) and the terrain will generate automatically.
 
-5. **Add day/night cycle**:
-   - Drag `DayNightCycleManager` into the level
-   - Configure time of day, cycle speed, and sun properties
-   - Optionally link it to an existing Directional Light
+For water, drag `DynamicWaterActor` into the level and position it where you want the water level. Assign the water material if you have one.
 
-6. **Test in Play mode**:
-   - Press Play in the editor
-   - Use **WASD** to move, **Mouse** to look around
-   - Use **E/Q** for vertical movement
-   - Hold **Shift** to sprint, **Ctrl** to move slowly
+To add the day/night cycle, drag `DayNightCycleManager` into the level. Configure the time of day, cycle speed, and sun properties. You can optionally link it to an existing Directional Light.
+
+Hit Play in the editor to test it out. Use **WASD** to move, **Mouse** to look around, **E/Q** for vertical movement, **Shift** to sprint, and **Ctrl** to move slowly.
 
 ### C++ Classes
 
 #### ProceduralTerrainActor
-Generates terrain meshes using noise functions.
-
-**Key Properties**:
+This generates terrain meshes using noise functions. Key properties:
 - `TerrainWidth/Height`: Grid dimensions
 - `GridSize`: Size of each grid square
 - `MaxHeight`: Maximum terrain elevation
@@ -108,7 +74,7 @@ Generates terrain meshes using noise functions.
 - `RandomSeed`: Seed for reproducible generation
 - `bUseSimplexNoise`: Toggle between Perlin and Simplex noise
 
-**Example Usage**:
+Example usage:
 ```cpp
 // Spawn terrain in C++
 AProceduralTerrainActor* Terrain = GetWorld()->SpawnActor<AProceduralTerrainActor>();
@@ -120,18 +86,14 @@ Terrain->GenerateTerrain();
 ```
 
 #### NoiseGenerator
-Provides Perlin and Simplex noise generation functions.
-
-**Functions**:
+Handles Perlin and Simplex noise generation. Functions:
 - `GeneratePerlinNoise2D()`: Multi-octave Perlin noise
 - `GenerateSimplexNoise2D()`: Simplex noise (faster, more organic)
 - `GeneratePerlinNoise3D()`: 3D Perlin noise for volumetric effects
 - `SetSeed()`: Set random seed
 
 #### DayNightCycleManager
-Manages the day/night cycle and sun lighting.
-
-**Key Properties**:
+Manages the day/night cycle and sun lighting. Key properties:
 - `TimeOfDay`: Current time (0-24 hours)
 - `CycleSpeed`: Hours per real-world second
 - `bAutoProgress`: Enable automatic time progression
@@ -139,15 +101,13 @@ Manages the day/night cycle and sun lighting.
 - `DayIntensity/NightIntensity`: Light intensity values
 - `DayColor/NightColor/SunsetColor`: Light colors for different times
 
-**Blueprint Functions**:
+Blueprint functions:
 - `GetTimeOfDay()`: Returns current time
 - `SetTimeOfDay(float)`: Manually set time
 - `GetNormalizedTimeOfDay()`: Returns 0-1 value for time
 
 #### DynamicWaterActor
-Creates a water plane with custom shader support.
-
-**Key Properties**:
+Creates a water plane with custom shader support. Key properties:
 - `WaterWidth/Length`: Dimensions of water plane
 - `WaterLevel`: Height (Z position)
 - `Subdivisions`: Mesh detail level
@@ -156,9 +116,7 @@ Creates a water plane with custom shader support.
 - `WaterMaterial`: Material to apply
 
 #### FreeCameraPawn
-Free-flying camera for world exploration.
-
-**Key Properties**:
+Free-flying camera for exploring the world. Key properties:
 - `BaseMovementSpeed`: Default movement speed
 - `SprintMultiplier`: Speed boost when sprinting
 - `SlowMultiplier`: Speed reduction for slow movement
@@ -168,62 +126,54 @@ Free-flying camera for world exploration.
 
 ### Blueprint Integration
 
-All classes are Blueprint-accessible and can be extended:
+All classes are Blueprint-accessible and can be extended. To create a Blueprint from a C++ class, right-click in the Content Browser → Blueprint Class, choose your parent class (e.g., `ProceduralTerrainActor`), and customize it in the Blueprint editor.
 
-1. **Create Blueprint from C++ class**:
-   - Right-click in Content Browser → Blueprint Class
-   - Choose your parent class (e.g., `ProceduralTerrainActor`)
-   - Customize in Blueprint editor
+Any `UPROPERTY` marked with `BlueprintReadWrite` can be modified, and any `UFUNCTION` marked with `BlueprintCallable` can be called.
 
-2. **Expose custom parameters**:
-   - All `UPROPERTY` marked with `BlueprintReadWrite` can be modified
-   - All `UFUNCTION` marked with `BlueprintCallable` can be called
-
-3. **Create custom terrain algorithms**:
-   - Extend `ProceduralTerrainActor` in Blueprint
-   - Use Event Graph to modify terrain generation logic
-   - Access `NoiseGenerator` functions for custom height calculations
+To create custom terrain algorithms, extend `ProceduralTerrainActor` in Blueprint, use the Event Graph to modify terrain generation logic, and access `NoiseGenerator` functions for custom height calculations.
 
 
 ## Customization
 
 ### Creating Custom Terrain Types
 
-1. **Desert terrain**:
-   ```cpp
-   TerrainWidth = 200;
-   TerrainHeight = 200;
-   NoiseScale = 200.0f;
-   MaxHeight = 500.0f;
-   Octaves = 2;
-   Persistence = 0.3f;
-   ```
+Here are some preset configurations for different terrain types:
 
-2. **Mountain terrain**:
-   ```cpp
-   TerrainWidth = 150;
-   TerrainHeight = 150;
-   NoiseScale = 80.0f;
-   MaxHeight = 5000.0f;
-   Octaves = 6;
-   Persistence = 0.6f;
-   Lacunarity = 2.5f;
-   ```
+**Desert terrain**:
+```cpp
+TerrainWidth = 200;
+TerrainHeight = 200;
+NoiseScale = 200.0f;
+MaxHeight = 500.0f;
+Octaves = 2;
+Persistence = 0.3f;
+```
 
-3. **Rolling hills**:
-   ```cpp
-   TerrainWidth = 100;
-   TerrainHeight = 100;
-   NoiseScale = 150.0f;
-   MaxHeight = 1500.0f;
-   Octaves = 3;
-   Persistence = 0.5f;
-   bUseSimplexNoise = true;
-   ```
+**Mountain terrain**:
+```cpp
+TerrainWidth = 150;
+TerrainHeight = 150;
+NoiseScale = 80.0f;
+MaxHeight = 5000.0f;
+Octaves = 6;
+Persistence = 0.6f;
+Lacunarity = 2.5f;
+```
+
+**Rolling hills**:
+```cpp
+TerrainWidth = 100;
+TerrainHeight = 100;
+NoiseScale = 150.0f;
+MaxHeight = 1500.0f;
+Octaves = 3;
+Persistence = 0.5f;
+bUseSimplexNoise = true;
+```
 
 ### Extending the System
 
-Add biomes, vegetation, or weather:
+You can add biomes, vegetation, or weather. Here's an example for biome-based terrain coloring:
 
 ```cpp
 // Example: Biome-based terrain coloring
@@ -248,20 +198,11 @@ void AProceduralTerrainActor::ApplyBiomeColors()
 
 ## Troubleshooting
 
-### Terrain not generating
-- Ensure `bAutoGenerate` is enabled
-- Check that `NoiseScale` is not zero
-- Verify `TerrainWidth` and `TerrainHeight` are positive
+**Terrain not generating?** Make sure `bAutoGenerate` is enabled, `NoiseScale` isn't zero, and `TerrainWidth` and `TerrainHeight` are positive.
 
-### Water not visible
-- Check that `WaterLevel` is within view
-- Ensure `WaterMaterial` is assigned
-- Verify the water actor is not below the terrain
+**Water not visible?** Check that `WaterLevel` is within view, `WaterMaterial` is assigned, and the water actor isn't below the terrain.
 
-### Day/night cycle not working
-- Ensure `bAutoProgress` is enabled
-- Check that `CycleSpeed` is greater than zero
-- Verify the `DirectionalLightActor` reference is set (if using external light)
+**Day/night cycle not working?** Ensure `bAutoProgress` is enabled, `CycleSpeed` is greater than zero, and the `DirectionalLightActor` reference is set (if you're using an external light).
 
 ## License
 
