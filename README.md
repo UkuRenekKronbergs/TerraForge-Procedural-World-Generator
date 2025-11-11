@@ -28,7 +28,8 @@ An interactive procedural world generator built with Unreal Engine that creates 
 - [x] **Automatic time progression** with configurable speed *(needs bug fixes)*  
 - [x] **Dynamic sun positioning** based on time of day *(needs bug fixes)*  
 - [x] **Smooth color transitions** between day, sunrise/sunset, and night *(needs bug fixes)*  
-- [x] **Adjustable intensity** for different times of day *(needs bug fixes)*  
+- [x] **Adjustable intensity** for different times of day *(needs bug fixes)*
+- [x] **Realistic sky** for a nice skybox *(needs to be made dynamic)*
 
 ### 🎮 Free Camera Controls
 - [x] **WASD movement** with smooth interpolation  
