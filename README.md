@@ -9,32 +9,31 @@ An interactive procedural world generator built with Unreal Engine that creates 
 ## Features
 
 ### 🏔️ Procedural Terrain Generation
-- **Noise-based terrain generation** using Perlin and Simplex noise algorithms
-- **Customizable parameters**: height, scale, octaves, persistence, and lacunarity
-- **Real-time mesh generation** with smooth normals and proper UV mapping
-- **Seed-based generation** for reproducible worlds
-- **Blueprint-exposed functions** for easy customization
+- [x] **Noise-based terrain generation** using Perlin and Simplex noise algorithms  
+- [x] **Customizable parameters**: height, scale, octaves, persistence, and lacunarity  
+- [ ] **Real-time mesh generation** with smooth normals and proper UV mapping *(in progress)*  
+- [ ] **Seed-based generation** for reproducible worlds *(planned)*  
+- [ ] **Blueprint-exposed functions** for easy customization *(planned)* 
 
 ### 🌊 Dynamic Water System
-- **Custom HLSL water shader** with:
-  - Animated waves using fractal Brownian motion
-  - Fresnel reflections for realistic water appearance
-  - Depth-based color transitions (shallow to deep water)
-  - Normal mapping for surface detail
-- **Procedurally generated water mesh** with adjustable subdivision
-- **Real-time wave parameters** controllable at runtime
+- [ ] **Custom HLSL water shader** with:
+  - [ ] Animated waves using fractal Brownian motion  
+  - [ ] Fresnel reflections for realistic water appearance  
+  - [ ] Depth-based color transitions (shallow to deep water)  
+  - [ ] Normal mapping for surface detail  
+- [ ] **Procedurally generated water mesh** with adjustable subdivision  
+- [ ] **Real-time wave parameters** controllable at runtime  
 
 ### 🌅 Day/Night Cycle
 - **Automatic time progression** with configurable speed
 - **Dynamic sun positioning** based on time of day
 - **Smooth color transitions** between day, sunrise/sunset, and night
 - **Adjustable intensity** for different times of day
-- **Blueprint integration** for easy time control
 
 ### 🎮 Free Camera Controls
 - **WASD movement** with smooth interpolation
-- **Mouse look** for camera orientation
-- **E/Q for vertical movement** (ascend/descend)
+- **Inverted mouse look** for camera orientation
+- **E/Q for vertical movement** ascend/descend
 - **Shift to sprint**, Ctrl to move slowly
 - **Customizable speed** and sensitivity settings
 
@@ -61,36 +60,11 @@ An interactive procedural world generator built with Unreal Engine that creates 
 4. **Launch the editor**:
    - Open `TerraForge.uproject` with Unreal Engine
 
-### Option 2: Pre-built Binary (If Available)
+### Option 2: Pre-built .exe folder (for testing the game)
 
 Download the latest release from the [Releases](https://github.com/UkuRenekKronbergs/TerraForge-Procedural-World-Generator/releases) page.
 
 ## Usage
-
-### Quick Start
-
-1. **Open the project** in Unreal Engine
-2. **Create a new level** or open an existing one
-3. **Add terrain**:
-   - Drag `ProceduralTerrainActor` from the Content Browser into the level
-   - Adjust parameters in the Details panel (size, noise scale, octaves, etc.)
-   - The terrain will generate automatically
-
-4. **Add water**:
-   - Drag `DynamicWaterActor` into the level
-   - Position it at your desired water level
-   - Assign the water material (if available)
-
-5. **Add day/night cycle**:
-   - Drag `DayNightCycleManager` into the level
-   - Configure time of day, cycle speed, and sun properties
-   - Optionally link it to an existing Directional Light
-
-6. **Test in Play mode**:
-   - Press Play in the editor
-   - Use **WASD** to move, **Mouse** to look around
-   - Use **E/Q** for vertical movement
-   - Hold **Shift** to sprint, **Ctrl** to move slowly
 
 ### C++ Classes
 
@@ -245,24 +219,6 @@ void AProceduralTerrainActor::ApplyBiomeColors()
     }
 }
 ```
-
-## Troubleshooting
-
-### Terrain not generating
-- Ensure `bAutoGenerate` is enabled
-- Check that `NoiseScale` is not zero
-- Verify `TerrainWidth` and `TerrainHeight` are positive
-
-### Water not visible
-- Check that `WaterLevel` is within view
-- Ensure `WaterMaterial` is assigned
-- Verify the water actor is not below the terrain
-
-### Day/night cycle not working
-- Ensure `bAutoProgress` is enabled
-- Check that `CycleSpeed` is greater than zero
-- Verify the `DirectionalLightActor` reference is set (if using external light)
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
