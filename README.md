@@ -203,7 +203,3 @@ void AProceduralTerrainActor::ApplyBiomeColors()
 **Water not visible?** Check that `WaterLevel` is within view, `WaterMaterial` is assigned, and the water actor isn't below the terrain.
 
 **Day/night cycle not working?** Ensure `bAutoProgress` is enabled, `CycleSpeed` is greater than zero, and the `DirectionalLightActor` reference is set (if you're using an external light).
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
