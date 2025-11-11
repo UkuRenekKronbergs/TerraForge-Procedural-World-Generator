@@ -25,17 +25,17 @@ An interactive procedural world generator built with Unreal Engine that creates 
 - [ ] **Real-time wave parameters** controllable at runtime  
 
 ### 🌅 Day/Night Cycle
-- **Automatic time progression** with configurable speed
-- **Dynamic sun positioning** based on time of day
-- **Smooth color transitions** between day, sunrise/sunset, and night
-- **Adjustable intensity** for different times of day
+- [x] **Automatic time progression** with configurable speed *(needs bug fixes)*  
+- [x] **Dynamic sun positioning** based on time of day *(needs bug fixes)*  
+- [x] **Smooth color transitions** between day, sunrise/sunset, and night *(needs bug fixes)*  
+- [x] **Adjustable intensity** for different times of day *(needs bug fixes)*  
 
 ### 🎮 Free Camera Controls
-- **WASD movement** with smooth interpolation
-- **Inverted mouse look** for camera orientation
-- **E/Q for vertical movement** ascend/descend
-- **Shift to sprint**, Ctrl to move slowly
-- **Customizable speed** and sensitivity settings
+- [x] **WASD movement** with smooth interpolation  
+- [x] **Inverted mouse look** for camera orientation  
+- [x] **E/Q for vertical movement** ascend/descend  
+- [x] **Shift to sprint**, Ctrl to move slowly  
+- [x] **Customizable speed** and sensitivity settings  
 
 ## Installation
 
