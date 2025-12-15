@@ -8,15 +8,24 @@ AFreeCameraPawn::AFreeCameraPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Create camera component
+	// Collision capsule to block geometry
+	CollisionComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision"));
+	CollisionComponent->InitCapsuleSize(CollisionRadius, CollisionHalfHeight);
+	CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CollisionComponent->SetCanEverAffectNavigation(false);
+	RootComponent = CollisionComponent;
+
+	// Camera anchored to capsule
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	RootComponent = Camera;
+	Camera->SetupAttachment(CollisionComponent);
+	Camera->SetRelativeLocation(FVector(0.0f, 0.0f, CameraHeightOffset));
 
 	// Create movement component
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	MovementComponent->MaxSpeed = BaseMovementSpeed;
 	MovementComponent->Acceleration = 4000.0f;
 	MovementComponent->Deceleration = 8000.0f;
+	MovementComponent->SetUpdatedComponent(CollisionComponent);
 
 	// Initialize state
 	bIsSprinting = false;
@@ -32,6 +41,17 @@ AFreeCameraPawn::AFreeCameraPawn()
 void AFreeCameraPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CollisionComponent)
+	{
+		CollisionComponent->InitCapsuleSize(CollisionRadius, CollisionHalfHeight);
+		CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
+	}
+
+	if (Camera)
+	{
+		Camera->SetRelativeLocation(FVector(0.0f, 0.0f, CameraHeightOffset));
+	}
 	
 	// Initialize target rotation to current rotation
 	TargetRotation = GetActorRotation();

@@ -2,6 +2,7 @@
 // Day Night Cycle Manager Implementation
 
 #include "DayNightCycleManager.h"
+#include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/DateTime.h"
 
@@ -16,6 +17,13 @@ ADayNightCycleManager::ADayNightCycleManager()
 	SunLight->SetIntensity(DayIntensity);
 	SunLight->SetLightColor(DayColor);
 	SunLight->SetCastShadows(true);
+
+	// Create default moon light component
+	MoonLight = CreateDefaultSubobject<UDirectionalLightComponent>(TEXT("MoonLight"));
+	MoonLight->SetupAttachment(RootComponent);
+	MoonLight->SetIntensity(0.0f);
+	MoonLight->SetLightColor(MoonColor);
+	MoonLight->SetCastShadows(false);
 }
 
 void ADayNightCycleManager::BeginPlay()
@@ -35,10 +43,23 @@ void ADayNightCycleManager::BeginPlay()
 			UE_LOG(LogTemp, Warning, TEXT("DayNightCycleManager: DirectionalLightActor missing UDirectionalLightComponent."));
 		}
 	}
+
+	if (MoonDirectionalLightActor)
+	{
+		if (UDirectionalLightComponent* DirectionalComponent = Cast<UDirectionalLightComponent>(MoonDirectionalLightActor->GetLightComponent()))
+		{
+			MoonLight = DirectionalComponent;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("DayNightCycleManager: MoonDirectionalLightActor missing UDirectionalLightComponent."));
+		}
+	}
 	
 	// Initialize sun position and properties
 	UpdateSunPosition();
 	UpdateSunProperties();
+	UpdateClockDisplay(0.0f);
 }
 
 void ADayNightCycleManager::Tick(float DeltaTime)
@@ -60,6 +81,7 @@ void ADayNightCycleManager::Tick(float DeltaTime)
 	// Update sun position and properties
 	UpdateSunPosition();
 	UpdateSunProperties();
+	UpdateClockDisplay(DeltaTime);
 }
 
 void ADayNightCycleManager::SetTimeOfDay(float NewTime)
@@ -92,6 +114,15 @@ void ADayNightCycleManager::UpdateSunPosition()
 	{
 		SunLight->SetWorldRotation(SunRotation);
 	}
+
+	if (MoonLight && bEnableMoonLight)
+	{
+		FRotator MoonRotation;
+		MoonRotation.Pitch = CalculateMoonAngle();
+		MoonRotation.Yaw = 0.0f;
+		MoonRotation.Roll = 0.0f;
+		MoonLight->SetWorldRotation(MoonRotation);
+	}
 }
 
 void ADayNightCycleManager::UpdateSunProperties()
@@ -101,76 +132,66 @@ void ADayNightCycleManager::UpdateSunProperties()
 		return;
 	}
 
-	float TransitionFactor = GetTransitionFactor();
-	
-	// Calculate intensity based on sun position
-	float CurrentIntensity;
-	if (TimeOfDay >= SunriseTime && TimeOfDay <= SunsetTime)
+	const float SunAngleDeg = CalculateSunAngle();
+	const float SunAngleRad = FMath::DegreesToRadians(SunAngleDeg);
+	const float SunHeight = FMath::Sin(SunAngleRad); // -1 (midnight) to 1 (noon)
+
+	// Smooth transition around horizon using twilight length
+	const float TwilightHalf = TwilightLength * 0.5f;
+	const float DawnStart = SunriseTime - TwilightHalf;
+	const float DawnEnd = SunriseTime + TwilightHalf;
+	const float DuskStart = SunsetTime - TwilightHalf;
+	const float DuskEnd = SunsetTime + TwilightHalf;
+
+	auto SmoothStepRange = [](float Value, float Edge0, float Edge1)
 	{
-		// Day time
-		CurrentIntensity = DayIntensity;
-		
-		// Reduce intensity during sunrise/sunset
-		if (TimeOfDay < SunriseTime + 1.0f)
-		{
-			// Sunrise transition
-			float Factor = (TimeOfDay - SunriseTime) / 1.0f;
-			CurrentIntensity = FMath::Lerp(NightIntensity, DayIntensity, Factor);
-		}
-		else if (TimeOfDay > SunsetTime - 1.0f)
-		{
-			// Sunset transition
-			float Factor = (SunsetTime - TimeOfDay) / 1.0f;
-			CurrentIntensity = FMath::Lerp(NightIntensity, DayIntensity, Factor);
-		}
-	}
-	else
+		const float Clamped = FMath::Clamp((Value - Edge0) / (Edge1 - Edge0), 0.0f, 1.0f);
+		return Clamped * Clamped * (3.0f - 2.0f * Clamped);
+	};
+
+	float DayFactor = 0.0f;
+	if (TimeOfDay >= DawnEnd && TimeOfDay <= DuskStart)
 	{
-		// Night time
-		CurrentIntensity = NightIntensity;
+		DayFactor = 1.0f;
 	}
-	
-	// Calculate color based on time of day
+	else if (TimeOfDay >= DawnStart && TimeOfDay < DawnEnd)
+	{
+		DayFactor = SmoothStepRange(TimeOfDay, DawnStart, DawnEnd);
+	}
+	else if (TimeOfDay > DuskStart && TimeOfDay <= DuskEnd)
+	{
+		DayFactor = 1.0f - SmoothStepRange(TimeOfDay, DuskStart, DuskEnd); // reverse fade out
+	}
+
+	const float CurrentIntensity = FMath::Lerp(NightIntensity, DayIntensity, DayFactor);
+
 	FLinearColor CurrentColor;
-	if (TimeOfDay >= SunriseTime - 0.5f && TimeOfDay <= SunriseTime + 0.5f)
+	if (DayFactor <= 0.01f)
 	{
-		// Sunrise colors
-		float Factor = (TimeOfDay - (SunriseTime - 0.5f)) / 1.0f;
-		CurrentColor = FMath::Lerp(NightColor, SunsetColor, Factor);
-	}
-	else if (TimeOfDay >= SunriseTime + 0.5f && TimeOfDay <= SunsetTime - 0.5f)
-	{
-		// Day colors
-		if (TimeOfDay < SunriseTime + 1.5f)
-		{
-			float Factor = (TimeOfDay - (SunriseTime + 0.5f)) / 1.0f;
-			CurrentColor = FMath::Lerp(SunsetColor, DayColor, Factor);
-		}
-		else if (TimeOfDay > SunsetTime - 1.5f)
-		{
-			float Factor = (SunsetTime - 0.5f - TimeOfDay) / 1.0f;
-			CurrentColor = FMath::Lerp(SunsetColor, DayColor, Factor);
-		}
-		else
-		{
-			CurrentColor = DayColor;
-		}
-	}
-	else if (TimeOfDay >= SunsetTime - 0.5f && TimeOfDay <= SunsetTime + 0.5f)
-	{
-		// Sunset colors
-		float Factor = (TimeOfDay - (SunsetTime - 0.5f)) / 1.0f;
-		CurrentColor = FMath::Lerp(SunsetColor, NightColor, Factor);
-	}
-	else
-	{
-		// Night colors
 		CurrentColor = NightColor;
 	}
-	
-	// Apply properties to light
+	else if (DayFactor >= 0.99f)
+	{
+		CurrentColor = DayColor;
+	}
+	else
+	{
+		// Blend night -> sunrise/sunset -> day based on factor
+		FLinearColor MidColor = SunsetColor;
+		CurrentColor = FMath::Lerp(NightColor, MidColor, FMath::Clamp(DayFactor * 2.0f, 0.0f, 1.0f));
+		CurrentColor = FMath::Lerp(CurrentColor, DayColor, FMath::Clamp((DayFactor - 0.5f) * 2.0f, 0.0f, 1.0f));
+	}
+
 	SunLight->SetIntensity(CurrentIntensity);
 	SunLight->SetLightColor(CurrentColor);
+
+	if (MoonLight)
+	{
+		const float MoonFactor = bEnableMoonLight ? (1.0f - DayFactor) : 0.0f;
+		MoonLight->SetIntensity(FMath::Max(0.0f, MoonIntensity * MoonFactor));
+		MoonLight->SetLightColor(MoonColor);
+		MoonLight->SetVisibility(MoonFactor > 0.01f);
+	}
 }
 
 float ADayNightCycleManager::CalculateSunAngle() const
@@ -186,6 +207,12 @@ float ADayNightCycleManager::CalculateSunAngle() const
 	float Angle = (NormalizedTime * 360.0f) - 90.0f; // Offset so sun rises in the east
 	
 	return Angle;
+}
+
+float ADayNightCycleManager::CalculateMoonAngle() const
+{
+	// Moon opposite to sun: add 180 degrees
+	return CalculateSunAngle() + 180.0f;
 }
 
 float ADayNightCycleManager::GetTransitionFactor() const
@@ -221,4 +248,44 @@ FText ADayNightCycleManager::GetRealWorldTimeText() const
 {
 	const FDateTime Now = FDateTime::Now();
 	return FText::FromString(Now.ToString(TEXT("%H:%M:%S")));
+}
+
+void ADayNightCycleManager::UpdateClockDisplay(float DeltaTime)
+{
+	ClockAccumulatedTime += DeltaTime;
+	if (ClockAccumulatedTime < ClockUpdateInterval)
+	{
+		return;
+	}
+	ClockAccumulatedTime = 0.0f;
+
+	if (!ClockWidget && ClockWidgetClass)
+	{
+		ClockWidget = CreateWidget<UUserWidget>(GetWorld(), ClockWidgetClass);
+		if (ClockWidget)
+		{
+			ClockWidget->AddToViewport();
+			ClockTextBlock = Cast<UTextBlock>(ClockWidget->GetWidgetFromName(TEXT("ClockText")));
+		}
+	}
+
+	const FText TimeText = GetFormattedTimeText();
+
+	if (ClockTextBlock)
+	{
+		ClockTextBlock->SetText(TimeText);
+	}
+	else if (bShowDebugClock && GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(ClockDebugMessageKey, ClockUpdateInterval * 1.1f, FColor::Cyan, TimeText.ToString());
+	}
+}
+
+FText ADayNightCycleManager::GetFormattedTimeText() const
+{
+	const int32 TotalMinutes = FMath::RoundToInt(TimeOfDay * 60.0f);
+	const int32 Hours = (TotalMinutes / 60) % 24;
+	const int32 Minutes = TotalMinutes % 60;
+
+	return FText::FromString(FString::Printf(TEXT("%02d:%02d"), Hours, Minutes));
 }

@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "Win64-Unreal",
+            "includePath": [
+                "${workspaceFolder}/Source/**",
+                "${workspaceFolder}/Intermediate/Build/**/Inc/**",
+                "${workspaceFolder}/Plugins/**/Source/**",
+
+                "C:/Program Files/Epic Games/UE_5.6/Engine/Source/**",
+                "C:/Program Files/Epic Games/UE_5.6/Engine/Plugins/**/Source/**",
+                "C:/Program Files/Epic Games/UE_5.6/Engine/Intermediate/Build/**/Inc/**"
+            ],
+            "defines": [
+                "UNICODE",
+                "_UNICODE",
+                "PLATFORM_WINDOWS=1",
+                "WITH_ENGINE=1",
+                "WITH_EDITOR=1",
+                "UE_BUILD_DEVELOPMENT=1"
+            ],
+            "windowsSdkVersion": "10.0.26100.0",
+            "compilerPath": "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/Source",
+                    "${workspaceFolder}/Intermediate/Build",
+                    "C:/Program Files/Epic Games/UE_5.6/Engine/Source",
+                    "C:/Program Files/Epic Games/UE_5.6/Engine/Plugins"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

@@ -2,15 +2,17 @@
 // Dynamic Water Actor Implementation
 
 #include "DynamicWaterActor.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 ADynamicWaterActor::ADynamicWaterActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Create procedural mesh component
 	WaterMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("WaterMesh"));
 	RootComponent = WaterMesh;
 	WaterMesh->bUseAsyncCooking = true;
+	WaterMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	WaterMesh->SetCollisionResponseToAllChannels(ECR_Block);
 
 	CurrentTime = 0.0f;
 }
@@ -22,6 +24,12 @@ void ADynamicWaterActor::BeginPlay()
 	GenerateWaterMesh();
 }
 
+void ADynamicWaterActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	GenerateWaterMesh();
+}
+
 void ADynamicWaterActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -30,16 +38,12 @@ void ADynamicWaterActor::Tick(float DeltaTime)
 	{
 		CurrentTime += DeltaTime * WaveSpeed;
 		
-		// Update material parameter for wave animation
-		if (WaterMaterial && WaterMesh)
+		// Update material parameters for wave animation using a single shared instance
+		if (DynamicMaterialInstance)
 		{
-			UMaterialInstanceDynamic* DynamicMaterial = WaterMesh->CreateDynamicMaterialInstance(0, WaterMaterial);
-			if (DynamicMaterial)
-			{
-				DynamicMaterial->SetScalarParameterValue(FName("Time"), CurrentTime);
-				DynamicMaterial->SetScalarParameterValue(FName("WaveHeight"), WaveHeight);
-				DynamicMaterial->SetScalarParameterValue(FName("WaveSpeed"), WaveSpeed);
-			}
+			DynamicMaterialInstance->SetScalarParameterValue(FName("Time"), CurrentTime);
+			DynamicMaterialInstance->SetScalarParameterValue(FName("WaveHeight"), WaveHeight);
+			DynamicMaterialInstance->SetScalarParameterValue(FName("WaveSpeed"), WaveSpeed);
 		}
 	}
 }
@@ -78,10 +82,16 @@ void ADynamicWaterActor::GenerateWaterMesh()
 	// Create the mesh section
 	WaterMesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents, false);
 
-	// Apply material if set
+	// Apply material if set and keep a dynamic instance for runtime updates
 	if (WaterMaterial)
 	{
 		WaterMesh->SetMaterial(0, WaterMaterial);
+		DynamicMaterialInstance = WaterMesh->CreateDynamicMaterialInstance(0, WaterMaterial);
+		if (DynamicMaterialInstance)
+		{
+			DynamicMaterialInstance->SetScalarParameterValue(FName("WaveHeight"), WaveHeight);
+			DynamicMaterialInstance->SetScalarParameterValue(FName("WaveSpeed"), WaveSpeed);
+		}
 	}
 }
 

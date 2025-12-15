@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "FreeCameraPawn.generated.h"
 
 /**
@@ -30,6 +31,10 @@ public:
 	/** Camera component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* Camera;
+
+	/** Collision capsule to prevent flying through objects */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UCapsuleComponent* CollisionComponent;
 
 	/** Movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -60,6 +65,18 @@ public:
 	/** Rotation interpolation speed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Camera", meta = (ClampMin = "1.0", ClampMax = "20.0"))
 	float RotationSmoothSpeed = 10.0f;
+
+	/** Collision capsule radius */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Camera", meta = (ClampMin = "10.0", ClampMax = "200.0"))
+	float CollisionRadius = 34.0f;
+
+	/** Collision capsule half-height */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Camera", meta = (ClampMin = "10.0", ClampMax = "400.0"))
+	float CollisionHalfHeight = 88.0f;
+
+	/** Camera offset above the capsule origin */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Camera", meta = (ClampMin = "0.0", ClampMax = "300.0"))
+	float CameraHeightOffset = 60.0f;
 
 private:
 	// Input handling functions
