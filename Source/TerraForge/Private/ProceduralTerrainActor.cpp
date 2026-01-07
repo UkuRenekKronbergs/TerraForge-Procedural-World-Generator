@@ -54,8 +54,10 @@ void AProceduralTerrainActor::GenerateTerrain()
 
 	// Clear existing mesh
 	ProceduralMesh->ClearAllMeshSections();
+	ProceduralMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Generate mesh data
+	TArray<float> HeightMap;
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
 	TArray<FVector> Normals;
@@ -63,8 +65,14 @@ void AProceduralTerrainActor::GenerateTerrain()
 	TArray<FColor> VertexColors;
 	TArray<FProcMeshTangent> Tangents;
 
-	// Generate vertices and UVs
-	GenerateVertices(Vertices, Normals, UVs);
+	GenerateHeightMap(HeightMap);
+	if (bSmoothTerrain)
+	{
+		SmoothHeightMap(HeightMap);
+	}
+
+	// Generate vertices and UVs from the (optionally smoothed) height map
+	GenerateVerticesFromHeightMap(HeightMap, Vertices, Normals, UVs);
 
 	// Generate triangles
 	GenerateTriangles(Triangles);
@@ -83,9 +91,10 @@ void AProceduralTerrainActor::GenerateTerrain()
 
 	// Create the mesh section
 	ProceduralMesh->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents, true);
-
-	// Enable collision
-	ProceduralMesh->ContainsPhysicsTriMeshData(true);
+	ProceduralMesh->SetMaterial(0, TerrainMaterial);
+	ProceduralMesh->bUseComplexAsSimpleCollision = true;
+	ProceduralMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	ProceduralMesh->SetCollisionResponseToAllChannels(ECR_Block);
 }
 
 void AProceduralTerrainActor::ClearTerrain()
@@ -96,7 +105,7 @@ void AProceduralTerrainActor::ClearTerrain()
 	}
 }
 
-void AProceduralTerrainActor::GenerateVertices(TArray<FVector>& Vertices, TArray<FVector>& Normals, TArray<FVector2D>& UVs)
+void AProceduralTerrainActor::GenerateVerticesFromHeightMap(const TArray<float>& HeightMap, TArray<FVector>& Vertices, TArray<FVector>& Normals, TArray<FVector2D>& UVs)
 {
 	Vertices.Empty();
 	Normals.Empty();
@@ -111,33 +120,16 @@ void AProceduralTerrainActor::GenerateVertices(TArray<FVector>& Vertices, TArray
 	{
 		for (int32 X = 0; X <= TerrainWidth; X++)
 		{
+			const int32 Index = Y * (TerrainWidth + 1) + X;
+
 			// Calculate world position
 			float WorldX = X * GridSize;
 			float WorldY = Y * GridSize;
+			float WorldZ = HeightMap.IsValidIndex(Index) ? HeightMap[Index] * MaxHeight : 0.0f;
 
-			// Generate height using noise
-			float Height = 0.0f;
-			if (bUseSimplexNoise)
-			{
-				Height = NoiseGenerator->GenerateSimplexNoise2D(WorldX, WorldY, NoiseScale);
-				// Simplex noise returns -1 to 1, convert to 0 to 1
-				Height = (Height + 1.0f) * 0.5f;
-			}
-			else
-			{
-				Height = NoiseGenerator->GeneratePerlinNoise2D(WorldX, WorldY, NoiseScale, Octaves, Persistence, Lacunarity);
-			}
-
-			// Apply height multiplier
-			float WorldZ = Height * MaxHeight;
-
-			// Add vertex
 			Vertices.Add(FVector(WorldX, WorldY, WorldZ));
-
-			// Add temporary normal (will be recalculated)
 			Normals.Add(FVector::UpVector);
 
-			// Add UV coordinates
 			float U = static_cast<float>(X) / TerrainWidth;
 			float V = static_cast<float>(Y) / TerrainHeight;
 			UVs.Add(FVector2D(U, V));
@@ -210,5 +202,85 @@ void AProceduralTerrainActor::CalculateNormals(const TArray<FVector>& Vertices, 
 	for (int32 i = 0; i < Normals.Num(); i++)
 	{
 		Normals[i] = Normals[i].GetSafeNormal();
+	}
+}
+
+void AProceduralTerrainActor::GenerateHeightMap(TArray<float>& OutHeightMap)
+{
+	const int32 NumVertices = (TerrainWidth + 1) * (TerrainHeight + 1);
+	OutHeightMap.SetNum(NumVertices);
+
+	for (int32 Y = 0; Y <= TerrainHeight; Y++)
+	{
+		for (int32 X = 0; X <= TerrainWidth; X++)
+		{
+			const int32 Index = Y * (TerrainWidth + 1) + X;
+			float WorldX = X * GridSize;
+			float WorldY = Y * GridSize;
+
+			float Height = 0.0f;
+			if (bUseSimplexNoise)
+			{
+				Height = NoiseGenerator->GenerateSimplexNoise2D(WorldX, WorldY, NoiseScale);
+				Height = (Height + 1.0f) * 0.5f; // simplex returns -1..1
+			}
+			else
+			{
+				Height = NoiseGenerator->GeneratePerlinNoise2D(WorldX, WorldY, NoiseScale, Octaves, Persistence, Lacunarity);
+			}
+
+			OutHeightMap[Index] = FMath::Clamp(Height, 0.0f, 1.0f);
+		}
+	}
+}
+
+void AProceduralTerrainActor::SmoothHeightMap(TArray<float>& HeightMap) const
+{
+	if (!bSmoothTerrain || SmoothingIterations <= 0)
+	{
+		return;
+	}
+
+	const int32 VertsPerSide = TerrainWidth + 1;
+	TArray<float> WorkingMap = HeightMap;
+
+	for (int32 Iter = 0; Iter < SmoothingIterations; Iter++)
+	{
+		for (int32 Y = 0; Y <= TerrainHeight; Y++)
+		{
+			for (int32 X = 0; X <= TerrainWidth; X++)
+			{
+				float Sum = 0.0f;
+				int32 Count = 0;
+
+				for (int32 OffsetY = -1; OffsetY <= 1; OffsetY++)
+				{
+					const int32 SampleY = Y + OffsetY;
+					if (SampleY < 0 || SampleY > TerrainHeight)
+					{
+						continue;
+					}
+
+					for (int32 OffsetX = -1; OffsetX <= 1; OffsetX++)
+					{
+						const int32 SampleX = X + OffsetX;
+						if (SampleX < 0 || SampleX > TerrainWidth)
+						{
+							continue;
+						}
+
+						const int32 SampleIndex = SampleY * VertsPerSide + SampleX;
+						Sum += WorkingMap[SampleIndex];
+						Count++;
+					}
+				}
+
+				const int32 Index = Y * VertsPerSide + X;
+				const float Average = (Count > 0) ? (Sum / static_cast<float>(Count)) : WorkingMap[Index];
+				HeightMap[Index] = FMath::Lerp(WorkingMap[Index], Average, SmoothingStrength);
+			}
+		}
+
+		WorkingMap = HeightMap;
 	}
 }

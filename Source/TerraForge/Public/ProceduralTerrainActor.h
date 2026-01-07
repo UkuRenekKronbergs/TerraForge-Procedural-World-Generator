@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "NoiseGenerator.h"
 #include "ProceduralTerrainActor.generated.h"
 
@@ -42,6 +43,10 @@ public:
 	/** Noise generator for terrain */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TerraForge|Terrain")
 	UNoiseGenerator* NoiseGenerator;
+
+	/** Optional material applied to the generated terrain */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Terrain")
+	UMaterialInterface* TerrainMaterial = nullptr;
 
 	// Terrain generation parameters
 	
@@ -89,13 +94,31 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Terrain")
 	bool bUseSimplexNoise = false;
 
+	/** Enable a simple height smoothing pass to reduce jagged edges */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Terrain")
+	bool bSmoothTerrain = true;
+
+	/** Number of smoothing iterations (more iterations = smoother but costlier) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Terrain", meta = (ClampMin = "0", ClampMax = "10"))
+	int32 SmoothingIterations = 2;
+
+	/** Blend factor for smoothing (0 keeps original height, 1 uses fully averaged height) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TerraForge|Terrain", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float SmoothingStrength = 0.6f;
+
 private:
-	/** Generate vertices for the terrain mesh */
-	void GenerateVertices(TArray<FVector>& Vertices, TArray<FVector>& Normals, TArray<FVector2D>& UVs);
+	/** Build vertices and UVs from a prepared height map */
+	void GenerateVerticesFromHeightMap(const TArray<float>& HeightMap, TArray<FVector>& Vertices, TArray<FVector>& Normals, TArray<FVector2D>& UVs);
 
 	/** Generate triangles for the terrain mesh */
 	void GenerateTriangles(TArray<int32>& Triangles);
 
 	/** Calculate normals for smooth terrain shading */
 	void CalculateNormals(const TArray<FVector>& Vertices, const TArray<int32>& Triangles, TArray<FVector>& Normals);
+
+	/** Generate raw height data using the configured noise generator */
+	void GenerateHeightMap(TArray<float>& OutHeightMap);
+
+	/** Apply a box blur-style smoothing to the height map */
+	void SmoothHeightMap(TArray<float>& HeightMap) const;
 };

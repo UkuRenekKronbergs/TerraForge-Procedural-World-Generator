@@ -20,6 +20,7 @@ public:
 	ADynamicWaterActor();
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
 
 public:	
@@ -76,4 +77,8 @@ private:
 
 	/** Current time for wave animation */
 	float CurrentTime;
+
+	/** Dynamic instance used for runtime wave parameter updates */
+	UPROPERTY(Transient)
+	UMaterialInstanceDynamic* DynamicMaterialInstance = nullptr;
 };
