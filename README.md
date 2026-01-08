@@ -2,6 +2,9 @@
 
 A graphics-focused Unreal Engine 5.7 environment/game demo. Development was restarted from scratch and shifted from C++ to Blueprints to iterate faster.
 
+## Newest project files here:
+https://cgvrgit.ulno.net/ukurene/TerraForge
+
 ![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.7-blue)
 
 
