@@ -22,7 +22,7 @@ https://cgvrgit.ulno.net/ukurene/TerraForge
 - Landscape material: MWLandscapeAutoMaterial.
 
 ## Development notes
-The project is graphically intensive and large in size, so it was developed locally without version control (some teammates did not have powerful enough machines to work on it).
+The project is graphically intensive and large in size, so it was developed locally without version control.
 
 **Dev machine**
 - Ryzen 7 5800X3D
