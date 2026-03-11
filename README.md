@@ -1,15 +1,19 @@
-# TerraForge - Proceduraly generated world
+# TerraForge - Procedurally Generated World
 
 A graphics-focused Unreal Engine 5.7 environment/game demo. Development was restarted from scratch and shifted from C++ to Blueprints to iterate faster.
 
-## Newest project files here:
-https://cgvrgit.ulno.net/ukurene/TerraForge
+## Project files
+[Newest project files here](https://cgvrgit.ulno.net/ukurene/TerraForge)
 
 ![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.7-blue)
 
+## Demo video (Youtube)
+
+[TerraForge](https://youtu.be/zjbzI74s7qE?si=eFKzL1W6zjPBjJCe)
+
 
 ## Key features
-- Dynamic time-of-day / day–night lighting.
+- Dynamic time-of-day / day-night lighting.
 - Ambient soundscape + river audio that reacts to proximity/placement.
 - Procedurally generated (PCG) forest with forest-removal splines and volumes to make it more realistic.
 - Rivers integrated into the environment (visuals + audio).
@@ -30,6 +34,6 @@ The project is graphically intensive and large in size, so it was developed loca
 - 64GB RAM
 
 ## How to run
-- From releases open the latest realease
-- After downloading unzip it
-- Finally open the folder and start the .exe file
+- From Releases, open the latest release.
+- After downloading, unzip it.
+- Open the folder and start the `.exe` file.
